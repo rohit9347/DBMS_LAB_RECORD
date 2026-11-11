@@ -1,0 +1,137 @@
+SQL*Plus: Release 11.2.0.1.0 Production on Mon Sep 14 10:25:30 2026
+
+Copyright (c) 1982, 2010, Oracle.  All rights reserved.
+
+Enter user-name: A228@db2021
+Enter password:
+
+Connected to:
+Oracle Database 11g Release 11.2.0.1.0 - Production
+
+SQL> -- EXPERIMENT 7: CREATION OF VIEWS, SEQUENCE, INDEXES AND SAVEPOINT IN ORACLE
+SQL>
+SQL> CREATE TABLE STUDENT
+  2  (
+  3   STUDENT_ID NUMBER(5) PRIMARY KEY,
+  4   STUDENT_NAME VARCHAR2(30),
+  5   DEPARTMENT VARCHAR2(20),
+  6   MARKS NUMBER(3)
+  7  );
+
+Table created.
+
+SQL> INSERT INTO STUDENT VALUES (101,'ARUN','CSE',85);
+
+1 row created.
+
+SQL> INSERT INTO STUDENT VALUES (102,'BALA','ECE',78);
+
+1 row created.
+
+SQL> INSERT INTO STUDENT VALUES (103,'DIVYA','IT',92);
+
+1 row created.
+
+SQL> INSERT INTO STUDENT VALUES (104,'KAVI','CSE',88);
+
+1 row created.
+
+SQL> COMMIT;
+
+Commit complete.
+
+SQL> -- VIEW
+SQL> CREATE VIEW CSE_STUDENTS AS
+  2  SELECT STUDENT_ID, STUDENT_NAME, MARKS
+  3  FROM STUDENT
+  4  WHERE DEPARTMENT = 'CSE';
+
+View created.
+
+SQL> SELECT * FROM CSE_STUDENTS;
+
+STUDENT_ID STUDENT_NAME                        MARKS
+---------- ------------------------------ ----------
+       101 ARUN                                   85
+       104 KAVI                                   88
+
+SQL> -- SEQUENCE
+SQL> CREATE SEQUENCE STUD_SEQ
+  2  START WITH 105
+  3  INCREMENT BY 1
+  4  MINVALUE 105
+  5  MAXVALUE 999
+  6  NOCYCLE
+  7  NOCACHE;
+
+Sequence created.
+
+SQL> SELECT STUD_SEQ.NEXTVAL FROM DUAL;
+
+   NEXTVAL
+----------
+       105
+
+SQL> SELECT STUD_SEQ.NEXTVAL FROM DUAL;
+
+   NEXTVAL
+----------
+       106
+
+SQL> INSERT INTO STUDENT VALUES (STUD_SEQ.NEXTVAL,'RAVI','ECE',81);
+
+1 row created.
+
+SQL> SELECT * FROM STUDENT;
+
+STUDENT_ID STUDENT_NAME                   DEPARTMENT                MARKS
+---------- ------------------------------ -------------------- ----------
+       101 ARUN                           CSE                          85
+       102 BALA                           ECE                          78
+       103 DIVYA                          IT                           92
+       104 KAVI                           CSE                          88
+       107 RAVI                           ECE                          81
+
+SQL> -- INDEX
+SQL> CREATE INDEX IDX_STUDENT_NAME ON STUDENT(STUDENT_NAME);
+
+Index created.
+
+SQL> SELECT INDEX_NAME, TABLE_NAME FROM USER_INDEXES WHERE TABLE_NAME = 'STUDENT';
+
+INDEX_NAME                     TABLE_NAME
+------------------------------ ------------------------------
+IDX_STUDENT_NAME               STUDENT
+SYS_C001234                    STUDENT
+
+SQL> -- SAVEPOINT
+SQL> INSERT INTO STUDENT VALUES (108,'SURESH','IT',90);
+
+1 row created.
+
+SQL> SAVEPOINT SP1;
+
+Savepoint created.
+
+SQL> INSERT INTO STUDENT VALUES (109,'MANOJ','CSE',87);
+
+1 row created.
+
+SQL> ROLLBACK TO SP1;
+
+Rollback complete.
+
+SQL> SELECT * FROM STUDENT;
+
+STUDENT_ID STUDENT_NAME                   DEPARTMENT                MARKS
+---------- ------------------------------ -------------------- ----------
+       101 ARUN                           CSE                          85
+       102 BALA                           ECE                          78
+       103 DIVYA                          IT                           92
+       104 KAVI                           CSE                          88
+       107 RAVI                           ECE                          81
+       108 SURESH                         IT                           90
+
+SQL> COMMIT;
+
+Commit complete.

@@ -1,0 +1,84 @@
+SQL*Plus: Release 11.2.0.1.0 Production on Mon Aug 3 09:30:15 2026
+
+Copyright (c) 1982, 2010, Oracle.  All rights reserved.
+
+Enter user-name: A228@db2021
+Enter password:
+
+Connected to:
+Oracle Database 11g Release 11.2.0.1.0 - Production
+
+SQL> -- EXPERIMENT 1: CREATION OF A DATABASE AND WRITING SQL QUERIES TO RETRIEVE INFORMATION
+SQL>
+SQL> CREATE TABLE STUDENT
+  2  (
+  3   STUDENT_ID NUMBER(5) PRIMARY KEY,
+  4   STUDENT_NAME VARCHAR2(30),
+  5   DEPARTMENT VARCHAR2(20),
+  6   AGE NUMBER(2),
+  7   MARKS NUMBER(3)
+  8  );
+
+Table created.
+
+SQL> INSERT INTO STUDENT VALUES (101,'ARUN','CSE',20,85);
+
+1 row created.
+
+SQL> INSERT INTO STUDENT VALUES (102,'BALA','ECE',21,78);
+
+1 row created.
+
+SQL> INSERT INTO STUDENT VALUES (103,'KAVI','CSE',20,92);
+
+1 row created.
+
+SQL> INSERT INTO STUDENT VALUES (104,'DIVYA','IT',21,88);
+
+1 row created.
+
+SQL> COMMIT;
+
+Commit complete.
+
+SQL> -- Step 3: Display All Records
+SQL> SELECT * FROM STUDENT;
+
+STUDENT_ID STUDENT_NAME                   DEPARTMENT                  AGE      MARKS
+---------- ------------------------------ -------------------- ---------- ----------
+       101 ARUN                           CSE                          20         85
+       102 BALA                           ECE                          21         78
+       103 KAVI                           CSE                          20         92
+       104 DIVYA                          IT                           21         88
+
+SQL> -- Step 4: Display Student Name and Marks
+SQL> SELECT STUDENT_NAME, MARKS
+  2  FROM STUDENT;
+
+STUDENT_NAME                        MARKS
+------------------------------ ----------
+ARUN                                   85
+BALA                                   78
+KAVI                                   92
+DIVYA                                  88
+
+SQL> -- Step 5: Retrieve CSE Students
+SQL> SELECT *
+  2  FROM STUDENT
+  3  WHERE DEPARTMENT = 'CSE';
+
+STUDENT_ID STUDENT_NAME                   DEPARTMENT                  AGE      MARKS
+---------- ------------------------------ -------------------- ---------- ----------
+       101 ARUN                           CSE                          20         85
+       103 KAVI                           CSE                          20         92
+
+SQL> -- Step 6: Retrieve Students Scoring More Than 80 Marks
+SQL> SELECT STUDENT_NAME, MARKS
+  2  FROM STUDENT
+  3  WHERE MARKS > 80;
+
+STUDENT_NAME                        MARKS
+------------------------------ ----------
+ARUN                                   85
+KAVI                                   92
+DIVYA                                  88

@@ -1,0 +1,177 @@
+SQL*Plus: Release 11.2.0.1.0 Production on Mon Sep 28 10:14:22 2026
+
+Copyright (c) 1982, 2010, Oracle.  All rights reserved.
+
+Enter user-name: A228@db2021
+Enter password:
+
+Connected to:
+Oracle Database 11g Release 11.2.0.1.0 - Production
+
+SQL> -- EXPERIMENT 9: CREATING RELATIONSHIPS BETWEEN TABLES AND PERFORMING JOINS AND SUBQUERIES
+SQL>
+SQL> CREATE TABLE DEPARTMENT
+  2  (
+  3   DEPT_ID NUMBER(3) PRIMARY KEY,
+  4   DEPT_NAME VARCHAR2(30)
+  5  );
+
+Table created.
+
+SQL> INSERT INTO DEPARTMENT VALUES (101,'CSE');
+
+1 row created.
+
+SQL> INSERT INTO DEPARTMENT VALUES (102,'ECE');
+
+1 row created.
+
+SQL> INSERT INTO DEPARTMENT VALUES (103,'IT');
+
+1 row created.
+
+SQL> CREATE TABLE STUDENT
+  2  (
+  3   STUDENT_ID NUMBER(5) PRIMARY KEY,
+  4   STUDENT_NAME VARCHAR2(30),
+  5   MARKS NUMBER(3),
+  6   DEPT_ID NUMBER(3),
+  7   CONSTRAINT FK_DEPT FOREIGN KEY (DEPT_ID) REFERENCES DEPARTMENT(DEPT_ID)
+  8  );
+
+Table created.
+
+SQL> INSERT INTO STUDENT VALUES (1001,'ARUN',85,101);
+
+1 row created.
+
+SQL> INSERT INTO STUDENT VALUES (1002,'BALA',78,102);
+
+1 row created.
+
+SQL> INSERT INTO STUDENT VALUES (1003,'DIVYA',92,103);
+
+1 row created.
+
+SQL> INSERT INTO STUDENT VALUES (1004,'KAVI',88,101);
+
+1 row created.
+
+SQL> COMMIT;
+
+Commit complete.
+
+SQL> -- 1. INNER JOIN
+SQL> SELECT S.STUDENT_ID, S.STUDENT_NAME, D.DEPT_NAME
+  2  FROM STUDENT S
+  3  INNER JOIN DEPARTMENT D ON S.DEPT_ID = D.DEPT_ID;
+
+STUDENT_ID STUDENT_NAME                   DEPT_NAME
+---------- ------------------------------ ------------------------------
+      1001 ARUN                           CSE
+      1002 BALA                           ECE
+      1003 DIVYA                          IT
+      1004 KAVI                           CSE
+
+SQL> -- 2. LEFT OUTER JOIN
+SQL> SELECT S.STUDENT_NAME, D.DEPT_NAME
+  2  FROM STUDENT S
+  3  LEFT OUTER JOIN DEPARTMENT D ON S.DEPT_ID = D.DEPT_ID;
+
+STUDENT_NAME                   DEPT_NAME
+------------------------------ ------------------------------
+ARUN                           CSE
+BALA                           ECE
+DIVYA                          IT
+KAVI                           CSE
+
+SQL> -- 3. RIGHT OUTER JOIN
+SQL> SELECT S.STUDENT_NAME, D.DEPT_NAME
+  2  FROM STUDENT S
+  3  RIGHT OUTER JOIN DEPARTMENT D ON S.DEPT_ID = D.DEPT_ID;
+
+STUDENT_NAME                   DEPT_NAME
+------------------------------ ------------------------------
+ARUN                           CSE
+KAVI                           CSE
+BALA                           ECE
+DIVYA                          IT
+
+SQL> -- 4. FULL OUTER JOIN
+SQL> SELECT S.STUDENT_NAME, D.DEPT_NAME
+  2  FROM STUDENT S
+  3  FULL OUTER JOIN DEPARTMENT D ON S.DEPT_ID = D.DEPT_ID;
+
+STUDENT_NAME                   DEPT_NAME
+------------------------------ ------------------------------
+ARUN                           CSE
+KAVI                           CSE
+BALA                           ECE
+DIVYA                          IT
+
+SQL> -- 5. SELF JOIN
+SQL> CREATE TABLE EMPLOYEE
+  2  (
+  3   EMP_ID NUMBER(5) PRIMARY KEY,
+  4   EMP_NAME VARCHAR2(30),
+  5   MANAGER_ID NUMBER(5)
+  6  );
+
+Table created.
+
+SQL> INSERT INTO EMPLOYEE VALUES (1,'RAJ',NULL);
+
+1 row created.
+
+SQL> INSERT INTO EMPLOYEE VALUES (2,'ARUN',1);
+
+1 row created.
+
+SQL> INSERT INTO EMPLOYEE VALUES (3,'BALA',1);
+
+1 row created.
+
+SQL> SELECT E.EMP_NAME EMPLOYEE, M.EMP_NAME MANAGER
+  2  FROM EMPLOYEE E
+  3  LEFT JOIN EMPLOYEE M ON E.MANAGER_ID = M.EMP_ID;
+
+EMPLOYEE                       MANAGER
+------------------------------ ------------------------------
+RAJ
+ARUN                           RAJ
+BALA                           RAJ
+
+SQL> -- 6. Subquery: Students Scoring Above Average Marks
+SQL> SELECT STUDENT_NAME, MARKS
+  2  FROM STUDENT
+  3  WHERE MARKS > (SELECT AVG(MARKS) FROM STUDENT);
+
+STUDENT_NAME                        MARKS
+------------------------------ ----------
+DIVYA                                  92
+KAVI                                   88
+
+SQL> -- 7. Subquery with IN: Students in CSE Department
+SQL> SELECT STUDENT_NAME
+  2  FROM STUDENT
+  3  WHERE DEPT_ID IN (SELECT DEPT_ID FROM DEPARTMENT WHERE DEPT_NAME = 'CSE');
+
+STUDENT_NAME
+------------------------------
+ARUN
+KAVI
+
+SQL> -- 8. Correlated Subquery: Students with Maximum Marks in Their Department
+SQL> SELECT STUDENT_NAME, MARKS, DEPT_ID
+  2  FROM STUDENT S1
+  3  WHERE MARKS = (
+  4      SELECT MAX(MARKS)
+  5      FROM STUDENT S2
+  6      WHERE S1.DEPT_ID = S2.DEPT_ID
+  7  );
+
+STUDENT_NAME                        MARKS    DEPT_ID
+------------------------------ ---------- ----------
+KAVI                                   88        101
+BALA                                   78        102
+DIVYA                                  92        103

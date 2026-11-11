@@ -1,0 +1,136 @@
+SQL*Plus: Release 11.2.0.1.0 Production on Mon Oct 5 12:15:11 2026
+
+Copyright (c) 1982, 2010, Oracle.  All rights reserved.
+
+Enter user-name: A228@db2021
+Enter password:
+
+Connected to:
+Oracle Database 11g Release 11.2.0.1.0 - Production
+
+SQL> -- EXPERIMENT 10 (c): CREATION OF PROCEDURES AND FUNCTIONS IN ORACLE PL/SQL
+SQL>
+SQL> SET SERVEROUTPUT ON;
+SQL>
+SQL> -- Step 1 & 2: Table and Sample Records
+SQL> CREATE TABLE STUDENT
+  2  (
+  3   STUDENT_ID NUMBER(5) PRIMARY KEY,
+  4   STUDENT_NAME VARCHAR2(30),
+  5   MARKS NUMBER(3)
+  6  );
+
+Table created.
+
+SQL> INSERT INTO STUDENT VALUES (101,'ARUN',85);
+
+1 row created.
+
+SQL> INSERT INTO STUDENT VALUES (102,'BALA',72);
+
+1 row created.
+
+SQL> INSERT INTO STUDENT VALUES (103,'DIVYA',91);
+
+1 row created.
+
+SQL> COMMIT;
+
+Commit complete.
+
+SQL> -- Step 3: Procedure
+SQL> CREATE OR REPLACE PROCEDURE GET_STUDENT
+  2  (
+  3   P_ID IN NUMBER
+  4  )
+  5  IS
+  6   V_NAME STUDENT.STUDENT_NAME%TYPE;
+  7   V_MARKS STUDENT.MARKS%TYPE;
+  8  BEGIN
+  9   SELECT STUDENT_NAME, MARKS
+ 10   INTO V_NAME, V_MARKS
+ 11   FROM STUDENT
+ 12   WHERE STUDENT_ID = P_ID;
+ 13   DBMS_OUTPUT.PUT_LINE('Student Name : ' || V_NAME);
+ 14   DBMS_OUTPUT.PUT_LINE('Marks        : ' || V_MARKS);
+ 15  EXCEPTION
+ 16   WHEN NO_DATA_FOUND THEN
+ 17    DBMS_OUTPUT.PUT_LINE('Student Record Not Found.');
+ 18  END;
+ 19  /
+
+Procedure created.
+
+SQL> -- Step 4: Execute Procedure
+SQL> EXEC GET_STUDENT(101);
+Student Name : ARUN
+Marks        : 85
+
+PL/SQL procedure successfully completed.
+
+SQL> EXEC GET_STUDENT(110);
+Student Record Not Found.
+
+PL/SQL procedure successfully completed.
+
+SQL> -- Step 5: Function to Find Grade
+SQL> CREATE OR REPLACE FUNCTION FIND_GRADE
+  2  (
+  3   P_MARKS NUMBER
+  4  )
+  5  RETURN VARCHAR2
+  6  IS
+  7   V_GRADE VARCHAR2(2);
+  8  BEGIN
+  9   IF P_MARKS >= 90 THEN
+ 10    V_GRADE := 'O';
+ 11   ELSIF P_MARKS >= 80 THEN
+ 12    V_GRADE := 'A+';
+ 13   ELSIF P_MARKS >= 70 THEN
+ 14    V_GRADE := 'A';
+ 15   ELSIF P_MARKS >= 60 THEN
+ 16    V_GRADE := 'B';
+ 17   ELSE
+ 18    V_GRADE := 'C';
+ 19   END IF;
+ 20   RETURN V_GRADE;
+ 21  END;
+ 22  /
+
+Function created.
+
+SQL> -- Step 6: Execute Function
+SQL> SELECT FIND_GRADE(91) AS GRADE FROM DUAL;
+
+GRADE
+--------------------
+O
+
+SQL> SELECT FIND_GRADE(75) AS GRADE FROM DUAL;
+
+GRADE
+--------------------
+A
+
+SQL> -- Step 7: Use Function with Table Data
+SQL> SELECT STUDENT_ID, STUDENT_NAME, MARKS, FIND_GRADE(MARKS) AS GRADE
+  2  FROM STUDENT;
+
+STUDENT_ID STUDENT_NAME                        MARKS GRADE
+---------- ------------------------------ ---------- --------------------
+       101 ARUN                                   85 A+
+       102 BALA                                   72 A
+       103 DIVYA                                  91 O
+
+SQL> -- Verify Created Objects
+SQL> SELECT OBJECT_NAME, OBJECT_TYPE FROM USER_OBJECTS WHERE OBJECT_TYPE = 'PROCEDURE';
+
+OBJECT_NAME                    OBJECT_TYPE
+------------------------------ -------------------
+GET_STUDENT                    PROCEDURE
+
+SQL> SELECT OBJECT_NAME, OBJECT_TYPE FROM USER_OBJECTS WHERE OBJECT_TYPE = 'FUNCTION';
+
+OBJECT_NAME                    OBJECT_TYPE
+------------------------------ -------------------
+FIND_GRADE                     FUNCTION

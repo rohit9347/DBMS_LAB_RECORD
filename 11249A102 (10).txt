@@ -1,0 +1,49 @@
+SQL*Plus: Release 11.2.0.1.0 Production on Mon Oct 5 11:01:18 2026
+
+Copyright (c) 1982, 2010, Oracle.  All rights reserved.
+
+Enter user-name: A228@db2021
+Enter password:
+
+Connected to:
+Oracle Database 11g Release 11.2.0.1.0 - Production
+
+SQL> -- EXPERIMENT 10 (a): PL/SQL BLOCK TO SATISFY CONDITIONS BY ACCEPTING INPUT FROM USER
+SQL>
+SQL> SET SERVEROUTPUT ON;
+SQL> DECLARE
+  2      N NUMBER;
+  3  BEGIN
+  4      N := &N;
+  5
+  6      IF N > 0 THEN
+  7          DBMS_OUTPUT.PUT_LINE('The number is Positive');
+  8      ELSIF N < 0 THEN
+  9          DBMS_OUTPUT.PUT_LINE('The number is Negative');
+ 10      ELSE
+ 11          DBMS_OUTPUT.PUT_LINE('The number is Zero');
+ 12      END IF;
+ 13  END;
+ 14  /
+Enter value for n: 25
+old   4:     N := &N;
+new   4:     N := 25;
+The number is Positive
+
+PL/SQL procedure successfully completed.
+
+SQL> /
+Enter value for n: -15
+old   4:     N := &N;
+new   4:     N := -15;
+The number is Negative
+
+PL/SQL procedure successfully completed.
+
+SQL> /
+Enter value for n: 0
+old   4:     N := &N;
+new   4:     N := 0;
+The number is Zero
+
+PL/SQL procedure successfully completed.

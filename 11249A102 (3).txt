@@ -1,0 +1,79 @@
+SQL*Plus: Release 11.2.0.1.0 Production on Mon Aug 17 11:05:40 2026
+
+Copyright (c) 1982, 2010, Oracle.  All rights reserved.
+
+Enter user-name: A228@db2021
+Enter password:
+
+Connected to:
+Oracle Database 11g Release 11.2.0.1.0 - Production
+
+SQL> -- EXPERIMENT 3: PRACTICING DCL AND TCL COMMANDS IN ORACLE
+SQL>
+SQL> CREATE TABLE EMPLOYEE
+  2  (
+  3   EMP_ID NUMBER(5) PRIMARY KEY,
+  4   EMP_NAME VARCHAR2(30),
+  5   SALARY NUMBER(8)
+  6  );
+
+Table created.
+
+SQL> INSERT INTO EMPLOYEE VALUES (101,'ARUN',35000);
+
+1 row created.
+
+SQL> INSERT INTO EMPLOYEE VALUES (102,'BALA',40000);
+
+1 row created.
+
+SQL> -- DCL Commands
+SQL> GRANT SELECT ON EMPLOYEE TO SCOTT;
+
+Grant succeeded.
+
+SQL> GRANT SELECT, INSERT, UPDATE ON EMPLOYEE TO SCOTT;
+
+Grant succeeded.
+
+SQL> REVOKE INSERT ON EMPLOYEE FROM SCOTT;
+
+Revoke succeeded.
+
+SQL> -- TCL Commands
+SQL> INSERT INTO EMPLOYEE VALUES (103,'DIVYA',45000);
+
+1 row created.
+
+SQL> COMMIT;
+
+Commit complete.
+
+SQL> INSERT INTO EMPLOYEE VALUES (104,'KAVI',42000);
+
+1 row created.
+
+SQL> SAVEPOINT SP1;
+
+Savepoint created.
+
+SQL> INSERT INTO EMPLOYEE VALUES (105,'RAVI',38000);
+
+1 row created.
+
+SQL> ROLLBACK TO SP1;
+
+Rollback complete.
+
+SQL> SELECT * FROM EMPLOYEE;
+
+    EMP_ID EMP_NAME                           SALARY
+---------- ------------------------------ ----------
+       101 ARUN                                35000
+       102 BALA                                40000
+       103 DIVYA                               45000
+       104 KAVI                                42000
+
+SQL> COMMIT;
+
+Commit complete.

@@ -1,0 +1,111 @@
+SQL*Plus: Release 11.2.0.1.0 Production on Mon Aug 24 10:20:10 2026
+
+Copyright (c) 1982, 2010, Oracle.  All rights reserved.
+
+Enter user-name: A228@db2021
+Enter password:
+
+Connected to:
+Oracle Database 11g Release 11.2.0.1.0 - Production
+
+SQL> -- EXPERIMENT 4: CREATING A DATABASE TO SET VARIOUS CONSTRAINTS IN ORACLE
+SQL>
+SQL> CREATE TABLE DEPARTMENT
+  2  (
+  3   DEPT_ID NUMBER(3),
+  4   DEPT_NAME VARCHAR2(30),
+  5   CONSTRAINT PK_DEPT PRIMARY KEY (DEPT_ID)
+  6  );
+
+Table created.
+
+SQL> CREATE TABLE EMPLOYEE
+  2  (
+  3   EMP_ID NUMBER(5),
+  4   EMP_NAME VARCHAR2(30) CONSTRAINT NN_EMPNAME NOT NULL,
+  5   EMAIL VARCHAR2(50),
+  6   SALARY NUMBER(8),
+  7   DEPT_ID NUMBER(3),
+  8   CONSTRAINT PK_EMP PRIMARY KEY (EMP_ID),
+  9   CONSTRAINT UK_EMAIL UNIQUE (EMAIL),
+ 10   CONSTRAINT CK_SALARY CHECK (SALARY >= 10000),
+ 11   CONSTRAINT FK_DEPT FOREIGN KEY (DEPT_ID)
+ 12   REFERENCES DEPARTMENT(DEPT_ID)
+ 13  );
+
+Table created.
+
+SQL> INSERT INTO DEPARTMENT VALUES (101,'CSE');
+
+1 row created.
+
+SQL> INSERT INTO DEPARTMENT VALUES (102,'ECE');
+
+1 row created.
+
+SQL> INSERT INTO EMPLOYEE VALUES (1001,'ARUN','arun@gmail.com',35000,101);
+
+1 row created.
+
+SQL> INSERT INTO EMPLOYEE VALUES (1002,'BALA','bala@gmail.com',30000,102);
+
+1 row created.
+
+SQL> -- Testing Constraints:
+SQL> -- 1. NOT NULL constraint violation:
+SQL> INSERT INTO EMPLOYEE VALUES (1003,NULL,'divya@gmail.com',25000,101);
+INSERT INTO EMPLOYEE VALUES (1003,NULL,'divya@gmail.com',25000,101)
+                             *
+ERROR at line 1:
+ORA-01400: cannot insert NULL into ("A228"."EMPLOYEE"."EMP_NAME")
+
+SQL> -- 2. UNIQUE constraint violation:
+SQL> INSERT INTO EMPLOYEE VALUES (1004,'KAVI','arun@gmail.com',28000,101);
+INSERT INTO EMPLOYEE VALUES (1004,'KAVI','arun@gmail.com',28000,101)
+*
+ERROR at line 1:
+ORA-00001: unique constraint (A228.UK_EMAIL) violated
+
+SQL> -- 3. CHECK constraint violation:
+SQL> INSERT INTO EMPLOYEE VALUES (1005,'RAVI','ravi@gmail.com',8000,101);
+INSERT INTO EMPLOYEE VALUES (1005,'RAVI','ravi@gmail.com',8000,101)
+*
+ERROR at line 1:
+ORA-02290: check constraint (A228.CK_SALARY) violated
+
+SQL> -- 4. FOREIGN KEY constraint violation:
+SQL> INSERT INTO EMPLOYEE VALUES (1006,'SURESH','suresh@gmail.com',25000,105);
+INSERT INTO EMPLOYEE VALUES (1006,'SURESH','suresh@gmail.com',25000,105)
+*
+ERROR at line 1:
+ORA-02291: integrity constraint (A228.FK_DEPT) violated - parent key not found
+
+SQL> -- 5. PRIMARY KEY constraint violation:
+SQL> INSERT INTO EMPLOYEE VALUES (1001,'MANOJ','manoj@gmail.com',30000,101);
+INSERT INTO EMPLOYEE VALUES (1001,'MANOJ','manoj@gmail.com',30000,101)
+*
+ERROR at line 1:
+ORA-00001: unique constraint (A228.PK_EMP) violated
+
+SQL> -- Display Valid Records
+SQL> SELECT * FROM EMPLOYEE;
+
+    EMP_ID EMP_NAME                       EMAIL                                                  SALARY    DEPT_ID
+---------- ------------------------------ -------------------------------------------------- ---------- ----------
+      1001 ARUN                           arun@gmail.com                                          35000        101
+      1002 BALA                           bala@gmail.com                                          30000        102
+
+SQL> DESC DEPARTMENT;
+ Name                                      Null?    Type
+ ----------------------------------------- -------- ----------------------------
+ DEPT_ID                                   NOT NULL NUMBER(3)
+ DEPT_NAME                                          VARCHAR2(30)
+
+SQL> DESC EMPLOYEE;
+ Name                                      Null?    Type
+ ----------------------------------------- -------- ----------------------------
+ EMP_ID                                    NOT NULL NUMBER(5)
+ EMP_NAME                                  NOT NULL VARCHAR2(30)
+ EMAIL                                              VARCHAR2(50)
+ SALARY                                             NUMBER(8)
+ DEPT_ID                                            NUMBER(3)

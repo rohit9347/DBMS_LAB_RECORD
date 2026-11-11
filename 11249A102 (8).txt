@@ -1,0 +1,101 @@
+SQL*Plus: Release 11.2.0.1.0 Production on Mon Sep 21 11:40:12 2026
+
+Copyright (c) 1982, 2010, Oracle.  All rights reserved.
+
+Enter user-name: A228@db2021
+Enter password:
+
+Connected to:
+Oracle Database 11g Release 11.2.0.1.0 - Production
+
+SQL> -- EXPERIMENT 8: NORMALIZATION IN ORACLE (1NF, 2NF, 3NF, 4NF, 5NF) USING FUNCTIONAL DEPENDENCIES
+SQL>
+SQL> -- 1NF: Eliminating repeating groups
+SQL> CREATE TABLE STUDENT_COURSE_1NF
+  2  (
+  3   STUDENT_ID NUMBER(5),
+  4   STUDENT_NAME VARCHAR2(30),
+  5   COURSE VARCHAR2(20)
+  6  );
+
+Table created.
+
+SQL> -- 2NF: Removing partial dependencies
+SQL> CREATE TABLE STUDENT_2NF
+  2  (
+  3   STUDENT_ID NUMBER(5) PRIMARY KEY,
+  4   STUDENT_NAME VARCHAR2(30)
+  5  );
+
+Table created.
+
+SQL> CREATE TABLE STUDENT_COURSE_2NF
+  2  (
+  3   STUDENT_ID NUMBER(5),
+  4   COURSE VARCHAR2(20),
+  5   PRIMARY KEY (STUDENT_ID, COURSE),
+  6   FOREIGN KEY (STUDENT_ID) REFERENCES STUDENT_2NF(STUDENT_ID)
+  7  );
+
+Table created.
+
+SQL> -- 3NF: Removing transitive dependencies
+SQL> CREATE TABLE DEPARTMENT_3NF
+  2  (
+  3   DEPT_ID VARCHAR2(5) PRIMARY KEY,
+  4   DEPT_NAME VARCHAR2(30)
+  5  );
+
+Table created.
+
+SQL> CREATE TABLE STUDENT_3NF
+  2  (
+  3   STUDENT_ID NUMBER(5) PRIMARY KEY,
+  4   STUDENT_NAME VARCHAR2(30),
+  5   DEPT_ID VARCHAR2(5),
+  6   FOREIGN KEY (DEPT_ID) REFERENCES DEPARTMENT_3NF(DEPT_ID)
+  7  );
+
+Table created.
+
+SQL> -- 4NF: Removing multivalued dependencies
+SQL> CREATE TABLE STUDENT_HOBBY
+  2  (
+  3   STUDENT_NAME VARCHAR2(30),
+  4   HOBBY VARCHAR2(30)
+  5  );
+
+Table created.
+
+SQL> CREATE TABLE STUDENT_LANGUAGE
+  2  (
+  3   STUDENT_NAME VARCHAR2(30),
+  4   LANGUAGE VARCHAR2(30)
+  5  );
+
+Table created.
+
+SQL> -- 5NF: Removing join dependencies
+SQL> CREATE TABLE SUPPLIER_PART
+  2  (
+  3   SUPPLIER_ID VARCHAR2(5),
+  4   PART_ID VARCHAR2(5)
+  5  );
+
+Table created.
+
+SQL> CREATE TABLE PART_PROJECT
+  2  (
+  3   PART_ID VARCHAR2(5),
+  4   PROJECT_ID VARCHAR2(5)
+  5  );
+
+Table created.
+
+SQL> CREATE TABLE SUPPLIER_PROJECT
+  2  (
+  3   SUPPLIER_ID VARCHAR2(5),
+  4   PROJECT_ID VARCHAR2(5)
+  5  );
+
+Table created.

@@ -1,0 +1,107 @@
+SQL*Plus: Release 11.2.0.1.0 Production on Mon Oct 5 11:30:44 2026
+
+Copyright (c) 1982, 2010, Oracle.  All rights reserved.
+
+Enter user-name: A228@db2021
+Enter password:
+
+Connected to:
+Oracle Database 11g Release 11.2.0.1.0 - Production
+
+SQL> -- EXPERIMENT 10 (b): PL/SQL BLOCK TO HANDLE EXCEPTIONS IN ORACLE
+SQL>
+SQL> SET SERVEROUTPUT ON;
+SQL>
+SQL> -- Program 1: Handling ZERO_DIVIDE Exception
+SQL> DECLARE
+  2      A NUMBER := 100;
+  3      B NUMBER := 0;
+  4      C NUMBER;
+  5  BEGIN
+  6      C := A / B;
+  7      DBMS_OUTPUT.PUT_LINE('Result = ' || C);
+  8  EXCEPTION
+  9      WHEN ZERO_DIVIDE THEN
+ 10          DBMS_OUTPUT.PUT_LINE('Error: Division by Zero is not allowed.');
+ 11  END;
+ 12  /
+Error: Division by Zero is not allowed.
+
+PL/SQL procedure successfully completed.
+
+SQL> -- Program 2: Handling NO_DATA_FOUND Exception
+SQL> DECLARE
+  2      V_NAME STUDENT.STUDENT_NAME%TYPE;
+  3  BEGIN
+  4      SELECT STUDENT_NAME
+  5      INTO V_NAME
+  6      FROM STUDENT
+  7      WHERE STUDENT_ID = 999;
+  8      DBMS_OUTPUT.PUT_LINE(V_NAME);
+  9  EXCEPTION
+ 10      WHEN NO_DATA_FOUND THEN
+ 11          DBMS_OUTPUT.PUT_LINE('Error: No matching record found.');
+ 12  END;
+ 13  /
+Error: No matching record found.
+
+PL/SQL procedure successfully completed.
+
+SQL> -- Program 3: Handling TOO_MANY_ROWS Exception
+SQL> DECLARE
+  2      V_NAME STUDENT.STUDENT_NAME%TYPE;
+  3  BEGIN
+  4      SELECT STUDENT_NAME
+  5      INTO V_NAME
+  6      FROM STUDENT;
+  7      DBMS_OUTPUT.PUT_LINE(V_NAME);
+  8  EXCEPTION
+  9      WHEN TOO_MANY_ROWS THEN
+ 10          DBMS_OUTPUT.PUT_LINE('Error: Query returned multiple rows.');
+ 11  END;
+ 12  /
+Error: Query returned multiple rows.
+
+PL/SQL procedure successfully completed.
+
+SQL> -- Program 4: Handling DUP_VAL_ON_INDEX Exception
+SQL> BEGIN
+  2      INSERT INTO STUDENT VALUES (101,'BALA');
+  3  EXCEPTION
+  4      WHEN DUP_VAL_ON_INDEX THEN
+  5          DBMS_OUTPUT.PUT_LINE('Error: Duplicate value violates unique constraint.');
+  6  END;
+  7  /
+Error: Duplicate value violates unique constraint.
+
+PL/SQL procedure successfully completed.
+
+SQL> -- Program 5: Handling VALUE_ERROR Exception
+SQL> DECLARE
+  2      V_NUM NUMBER(2);
+  3  BEGIN
+  4      V_NUM := 12345;
+  5  EXCEPTION
+  6      WHEN VALUE_ERROR THEN
+  7          DBMS_OUTPUT.PUT_LINE('Error: Value exceeds variable size.');
+  8  END;
+  9  /
+Error: Value exceeds variable size.
+
+PL/SQL procedure successfully completed.
+
+SQL> -- Program 6: Using OTHERS Handler
+SQL> DECLARE
+  2      V_NUM NUMBER;
+  3  BEGIN
+  4      V_NUM := 10 / 0;
+  5  EXCEPTION
+  6      WHEN OTHERS THEN
+  7          DBMS_OUTPUT.PUT_LINE('SQLCODE : ' || SQLCODE);
+  8          DBMS_OUTPUT.PUT_LINE('SQLERRM : ' || SQLERRM);
+  9  END;
+ 10  /
+SQLCODE : -1476
+SQLERRM : ORA-01476: divisor is equal to zero
+
+PL/SQL procedure successfully completed.

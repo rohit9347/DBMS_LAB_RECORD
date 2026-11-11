@@ -1,0 +1,131 @@
+SQL*Plus: Release 11.2.0.1.0 Production on Mon Oct 5 12:45:00 2026
+
+Copyright (c) 1982, 2010, Oracle.  All rights reserved.
+
+Enter user-name: A228@db2021
+Enter password:
+
+Connected to:
+Oracle Database 11g Release 11.2.0.1.0 - Production
+
+SQL> -- EXPERIMENT 10 (d): CREATION OF DATABASE TRIGGERS (INSERT, UPDATE, DELETE)
+SQL>
+SQL> CREATE TABLE EMPLOYEE
+  2  (
+  3   EMP_ID NUMBER(5) PRIMARY KEY,
+  4   EMP_NAME VARCHAR2(30),
+  5   SALARY NUMBER(8)
+  6  );
+
+Table created.
+
+SQL> CREATE TABLE EMP_AUDIT
+  2  (
+  3   AUDIT_ID NUMBER(5),
+  4   EMP_ID NUMBER(5),
+  5   ACTION_PERFORMED VARCHAR2(20),
+  6   ACTION_DATE DATE
+  7  );
+
+Table created.
+
+SQL> CREATE SEQUENCE EMP_AUDIT_SEQ START WITH 1 INCREMENT BY 1;
+
+Sequence created.
+
+SQL> INSERT INTO EMPLOYEE VALUES (101,'ARUN',35000);
+
+1 row created.
+
+SQL> INSERT INTO EMPLOYEE VALUES (102,'BALA',40000);
+
+1 row created.
+
+SQL> COMMIT;
+
+Commit complete.
+
+SQL> -- Step 4: INSERT Trigger
+SQL> CREATE OR REPLACE TRIGGER TRG_EMP_INSERT
+  2  AFTER INSERT
+  3  ON EMPLOYEE
+  4  FOR EACH ROW
+  5  BEGIN
+  6   INSERT INTO EMP_AUDIT
+  7   VALUES (EMP_AUDIT_SEQ.NEXTVAL, :NEW.EMP_ID, 'INSERT', SYSDATE);
+  8  END;
+  9  /
+
+Trigger created.
+
+SQL> -- Test INSERT Trigger
+SQL> INSERT INTO EMPLOYEE VALUES (103,'DIVYA',45000);
+
+1 row created.
+
+SQL> SELECT * FROM EMP_AUDIT;
+
+  AUDIT_ID     EMP_ID ACTION_PERFORMED     ACTION_DATE
+---------- ---------- -------------------- -----------
+         1        103 INSERT               05-OCT-26
+
+SQL> -- Step 5: UPDATE Trigger
+SQL> CREATE OR REPLACE TRIGGER TRG_EMP_UPDATE
+  2  AFTER UPDATE
+  3  ON EMPLOYEE
+  4  FOR EACH ROW
+  5  BEGIN
+  6   INSERT INTO EMP_AUDIT
+  7   VALUES (EMP_AUDIT_SEQ.NEXTVAL, :NEW.EMP_ID, 'UPDATE', SYSDATE);
+  8  END;
+  9  /
+
+Trigger created.
+
+SQL> -- Test UPDATE Trigger
+SQL> UPDATE EMPLOYEE
+  2  SET SALARY = 50000
+  3  WHERE EMP_ID = 101;
+
+1 row updated.
+
+SQL> SELECT * FROM EMP_AUDIT;
+
+  AUDIT_ID     EMP_ID ACTION_PERFORMED     ACTION_DATE
+---------- ---------- -------------------- -----------
+         1        103 INSERT               05-OCT-26
+         2        101 UPDATE               05-OCT-26
+
+SQL> -- Step 6: DELETE Trigger
+SQL> CREATE OR REPLACE TRIGGER TRG_EMP_DELETE
+  2  AFTER DELETE
+  3  ON EMPLOYEE
+  4  FOR EACH ROW
+  5  BEGIN
+  6   INSERT INTO EMP_AUDIT
+  7   VALUES (EMP_AUDIT_SEQ.NEXTVAL, :OLD.EMP_ID, 'DELETE', SYSDATE);
+  8  END;
+  9  /
+
+Trigger created.
+
+SQL> -- Test DELETE Trigger
+SQL> DELETE FROM EMPLOYEE
+  2  WHERE EMP_ID = 102;
+
+1 row deleted.
+
+SQL> SELECT * FROM EMP_AUDIT;
+
+  AUDIT_ID     EMP_ID ACTION_PERFORMED     ACTION_DATE
+---------- ---------- -------------------- -----------
+         1        103 INSERT               05-OCT-26
+         2        101 UPDATE               05-OCT-26
+         3        102 DELETE               05-OCT-26
+
+SQL> SELECT * FROM EMPLOYEE;
+
+    EMP_ID EMP_NAME                           SALARY
+---------- ------------------------------ ----------
+       101 ARUN                                50000
+       103 DIVYA                               45000

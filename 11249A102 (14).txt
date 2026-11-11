@@ -1,0 +1,109 @@
+SQL*Plus: Release 11.2.0.1.0 Production on Mon Oct 5 13:10:00 2026
+
+Copyright (c) 1982, 2010, Oracle.  All rights reserved.
+
+Enter user-name: A228@db2021
+Enter password:
+
+Connected to:
+Oracle Database 11g Release 11.2.0.1.0 - Production
+
+SQL> -- EXPERIMENT 10 (e): DATABASE OPERATIONS WITH IMPLICIT AND EXPLICIT CURSORS
+SQL>
+SQL> SET SERVEROUTPUT ON;
+SQL>
+SQL> CREATE TABLE EMPLOYEE
+  2  (
+  3   EMP_ID NUMBER(5) PRIMARY KEY,
+  4   EMP_NAME VARCHAR2(30),
+  5   DEPARTMENT VARCHAR2(20),
+  6   SALARY NUMBER(8)
+  7  );
+
+Table created.
+
+SQL> INSERT INTO EMPLOYEE VALUES (101,'ARUN','CSE',35000);
+
+1 row created.
+
+SQL> INSERT INTO EMPLOYEE VALUES (102,'BALA','ECE',32000);
+
+1 row created.
+
+SQL> INSERT INTO EMPLOYEE VALUES (103,'DIVYA','IT',45000);
+
+1 row created.
+
+SQL> INSERT INTO EMPLOYEE VALUES (104,'KAVI','CSE',40000);
+
+1 row created.
+
+SQL> COMMIT;
+
+Commit complete.
+
+SQL> -- Part A: Implicit Cursor
+SQL> BEGIN
+  2   UPDATE EMPLOYEE
+  3   SET SALARY = SALARY + 5000
+  4   WHERE DEPARTMENT = 'CSE';
+  5   DBMS_OUTPUT.PUT_LINE(SQL%ROWCOUNT || ' row(s) updated.');
+  6   COMMIT;
+  7  END;
+  8  /
+2 row(s) updated.
+
+PL/SQL procedure successfully completed.
+
+SQL> SELECT * FROM EMPLOYEE;
+
+    EMP_ID EMP_NAME                       DEPARTMENT               SALARY
+---------- ------------------------------ -------------------- ----------
+       101 ARUN                           CSE                       40000
+       102 BALA                           ECE                       32000
+       103 DIVYA                          IT                        45000
+       104 KAVI                           CSE                       45000
+
+SQL> -- Part B: Explicit Cursor
+SQL> DECLARE
+  2   CURSOR EMP_CURSOR IS
+  3    SELECT EMP_ID, EMP_NAME, DEPARTMENT, SALARY
+  4    FROM EMPLOYEE;
+  5   V_ID EMPLOYEE.EMP_ID%TYPE;
+  6   V_NAME EMPLOYEE.EMP_NAME%TYPE;
+  7   V_DEPT EMPLOYEE.DEPARTMENT%TYPE;
+  8   V_SAL EMPLOYEE.SALARY%TYPE;
+  9  BEGIN
+ 10   OPEN EMP_CURSOR;
+ 11   LOOP
+ 12    FETCH EMP_CURSOR INTO V_ID, V_NAME, V_DEPT, V_SAL;
+ 13    EXIT WHEN EMP_CURSOR%NOTFOUND;
+ 14    DBMS_OUTPUT.PUT_LINE(V_ID || ' ' || V_NAME || ' ' || V_DEPT || ' ' || V_SAL);
+ 15   END LOOP;
+ 16   CLOSE EMP_CURSOR;
+ 17  END;
+ 18  /
+101 ARUN CSE 40000
+102 BALA ECE 32000
+103 DIVYA IT 45000
+104 KAVI CSE 45000
+
+PL/SQL procedure successfully completed.
+
+SQL> -- Cursor FOR Loop
+SQL> DECLARE
+  2   CURSOR EMP_CURSOR IS
+  3    SELECT EMP_ID, EMP_NAME, SALARY
+  4    FROM EMPLOYEE;
+  5  BEGIN
+  6   FOR EMP_REC IN EMP_CURSOR LOOP
+  7    DBMS_OUTPUT.PUT_LINE(EMP_REC.EMP_ID || ' ' || EMP_REC.EMP_NAME || ' ' || EMP_REC.SALARY);
+  8   END LOOP;
+  9  END;
+ 10  /
+101 ARUN 40000
+102 BALA 32000
+103 DIVYA 45000
+104 KAVI 45000
+
+PL/SQL procedure successfully completed.

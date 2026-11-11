@@ -1,0 +1,142 @@
+SQL*Plus: Release 11.2.0.1.0 Production on Mon Aug 31 11:10:45 2026
+
+Copyright (c) 1982, 2010, Oracle.  All rights reserved.
+
+Enter user-name: A228@db2021
+Enter password:
+
+Connected to:
+Oracle Database 11g Release 11.2.0.1.0 - Production
+
+SQL> -- EXPERIMENT 5: PERFORMING QUERIES USING ANY, ALL, IN, EXISTS, NOT EXISTS, UNION, INTERSECT
+SQL>
+SQL> CREATE TABLE STUDENT
+  2  (
+  3   STUDENT_ID NUMBER(5) PRIMARY KEY,
+  4   STUDENT_NAME VARCHAR2(30),
+  5   DEPARTMENT VARCHAR2(20),
+  6   MARKS NUMBER(3)
+  7  );
+
+Table created.
+
+SQL> INSERT INTO STUDENT VALUES (101,'ARUN','CSE',85);
+
+1 row created.
+
+SQL> INSERT INTO STUDENT VALUES (102,'BALA','ECE',78);
+
+1 row created.
+
+SQL> INSERT INTO STUDENT VALUES (103,'DIVYA','IT',92);
+
+1 row created.
+
+SQL> INSERT INTO STUDENT VALUES (104,'KAVI','CSE',88);
+
+1 row created.
+
+SQL> CREATE TABLE ALUMNI
+  2  (
+  3   STUDENT_NAME VARCHAR2(30)
+  4  );
+
+Table created.
+
+SQL> INSERT INTO ALUMNI VALUES ('ARUN');
+
+1 row created.
+
+SQL> INSERT INTO ALUMNI VALUES ('RAVI');
+
+1 row created.
+
+SQL> INSERT INTO ALUMNI VALUES ('KAVI');
+
+1 row created.
+
+SQL> COMMIT;
+
+Commit complete.
+
+SQL> -- Query Using IN
+SQL> SELECT * FROM STUDENT WHERE DEPARTMENT IN ('CSE','IT');
+
+STUDENT_ID STUDENT_NAME                   DEPARTMENT                MARKS
+---------- ------------------------------ -------------------- ----------
+       101 ARUN                           CSE                          85
+       103 DIVYA                          IT                           92
+       104 KAVI                           CSE                          88
+
+SQL> -- Query Using ANY
+SQL> SELECT * FROM STUDENT
+  2  WHERE MARKS > ANY
+  3  (
+  4   SELECT MARKS FROM STUDENT WHERE DEPARTMENT = 'ECE'
+  5  );
+
+STUDENT_ID STUDENT_NAME                   DEPARTMENT                MARKS
+---------- ------------------------------ -------------------- ----------
+       101 ARUN                           CSE                          85
+       103 DIVYA                          IT                           92
+       104 KAVI                           CSE                          88
+
+SQL> -- Query Using ALL
+SQL> SELECT * FROM STUDENT
+  2  WHERE MARKS > ALL
+  3  (
+  4   SELECT MARKS FROM STUDENT WHERE DEPARTMENT = 'ECE'
+  5  );
+
+STUDENT_ID STUDENT_NAME                   DEPARTMENT                MARKS
+---------- ------------------------------ -------------------- ----------
+       101 ARUN                           CSE                          85
+       103 DIVYA                          IT                           92
+       104 KAVI                           CSE                          88
+
+SQL> -- Query Using EXISTS
+SQL> SELECT STUDENT_NAME FROM STUDENT S
+  2  WHERE EXISTS
+  3  (
+  4   SELECT * FROM ALUMNI A WHERE A.STUDENT_NAME = S.STUDENT_NAME
+  5  );
+
+STUDENT_NAME
+------------------------------
+ARUN
+KAVI
+
+SQL> -- Query Using NOT EXISTS
+SQL> SELECT STUDENT_NAME FROM STUDENT S
+  2  WHERE NOT EXISTS
+  3  (
+  4   SELECT * FROM ALUMNI A WHERE A.STUDENT_NAME = S.STUDENT_NAME
+  5  );
+
+STUDENT_NAME
+------------------------------
+BALA
+DIVYA
+
+SQL> -- Query Using UNION
+SQL> SELECT STUDENT_NAME FROM STUDENT
+  2  UNION
+  3  SELECT STUDENT_NAME FROM ALUMNI;
+
+STUDENT_NAME
+------------------------------
+ARUN
+BALA
+DIVYA
+KAVI
+RAVI
+
+SQL> -- Query Using INTERSECT
+SQL> SELECT STUDENT_NAME FROM STUDENT
+  2  INTERSECT
+  3  SELECT STUDENT_NAME FROM ALUMNI;
+
+STUDENT_NAME
+------------------------------
+ARUN
+KAVI

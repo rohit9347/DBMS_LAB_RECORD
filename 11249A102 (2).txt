@@ -1,0 +1,122 @@
+SQL*Plus: Release 11.2.0.1.0 Production on Mon Aug 10 10:15:20 2026
+
+Copyright (c) 1982, 2010, Oracle.  All rights reserved.
+
+Enter user-name: A228@db2021
+Enter password:
+
+Connected to:
+Oracle Database 11g Release 11.2.0.1.0 - Production
+
+SQL> -- EXPERIMENT 2: PERFORMING INSERTION, DELETION, MODIFYING, ALTERING, UPDATING AND VIEWING RECORDS
+SQL>
+SQL> CREATE TABLE EMPLOYEE
+  2  (
+  3   EMP_ID NUMBER(5) PRIMARY KEY,
+  4   EMP_NAME VARCHAR2(30),
+  5   DEPARTMENT VARCHAR2(20),
+  6   SALARY NUMBER(8),
+  7   CITY VARCHAR2(20)
+  8  );
+
+Table created.
+
+SQL> INSERT INTO EMPLOYEE VALUES (101,'ARUN','CSE',35000,'CHENNAI');
+
+1 row created.
+
+SQL> INSERT INTO EMPLOYEE VALUES (102,'BALA','ECE',32000,'VELLORE');
+
+1 row created.
+
+SQL> INSERT INTO EMPLOYEE VALUES (103,'DIVYA','IT',40000,'KANCHIPURAM');
+
+1 row created.
+
+SQL> INSERT INTO EMPLOYEE VALUES (104,'KAVI','CSE',38000,'CHENNAI');
+
+1 row created.
+
+SQL> COMMIT;
+
+Commit complete.
+
+SQL> -- Step 3: View All Records
+SQL> SELECT * FROM EMPLOYEE;
+
+    EMP_ID EMP_NAME                       DEPARTMENT               SALARY CITY
+---------- ------------------------------ -------------------- ---------- --------------------
+       101 ARUN                           CSE                       35000 CHENNAI
+       102 BALA                           ECE                       32000 VELLORE
+       103 DIVYA                          IT                        40000 KANCHIPURAM
+       104 KAVI                           CSE                       38000 CHENNAI
+
+SQL> -- Step 4: Update Records Based on a Condition
+SQL> UPDATE EMPLOYEE
+  2  SET SALARY = 35000
+  3  WHERE EMP_ID = 102;
+
+1 row updated.
+
+SQL> SELECT * FROM EMPLOYEE WHERE EMP_ID = 102;
+
+    EMP_ID EMP_NAME                       DEPARTMENT               SALARY CITY
+---------- ------------------------------ -------------------- ---------- --------------------
+       102 BALA                           ECE                       35000 VELLORE
+
+SQL> -- Step 5: Delete Records Based on a Condition
+SQL> DELETE FROM EMPLOYEE
+  2  WHERE DEPARTMENT = 'IT';
+
+1 row deleted.
+
+SQL> SELECT * FROM EMPLOYEE;
+
+    EMP_ID EMP_NAME                       DEPARTMENT               SALARY CITY
+---------- ------------------------------ -------------------- ---------- --------------------
+       101 ARUN                           CSE                       35000 CHENNAI
+       102 BALA                           ECE                       35000 VELLORE
+       104 KAVI                           CSE                       38000 CHENNAI
+
+SQL> -- Step 6: Alter the Table Structure
+SQL> ALTER TABLE EMPLOYEE
+  2  ADD EMAIL VARCHAR2(40);
+
+Table altered.
+
+SQL> DESC EMPLOYEE;
+ Name                                      Null?    Type
+ ----------------------------------------- -------- ----------------------------
+ EMP_ID                                    NOT NULL NUMBER(5)
+ EMP_NAME                                           VARCHAR2(30)
+ DEPARTMENT                                         VARCHAR2(20)
+ SALARY                                             NUMBER(8)
+ CITY                                               VARCHAR2(20)
+ EMAIL                                              VARCHAR2(40)
+
+SQL> -- Step 7: Modify a Column's Size
+SQL> ALTER TABLE EMPLOYEE
+  2  MODIFY EMP_NAME VARCHAR2(50);
+
+Table altered.
+
+SQL> -- Step 8: View Records Based on Conditions
+SQL> SELECT * FROM EMPLOYEE WHERE DEPARTMENT = 'CSE';
+
+    EMP_ID EMP_NAME                       DEPARTMENT               SALARY CITY                 EMAIL
+---------- ------------------------------ -------------------- ---------- -------------------- --------------------
+       101 ARUN                           CSE                       35000 CHENNAI
+       104 KAVI                           CSE                       38000 CHENNAI
+
+SQL> SELECT EMP_NAME, SALARY FROM EMPLOYEE WHERE SALARY > 35000;
+
+EMP_NAME                                               SALARY
+-------------------------------------------------- ----------
+KAVI                                                    38000
+
+SQL> SELECT EMP_NAME, CITY FROM EMPLOYEE WHERE CITY = 'CHENNAI';
+
+EMP_NAME                                           CITY
+-------------------------------------------------- --------------------
+ARUN                                               CHENNAI
+KAVI                                               CHENNAI
